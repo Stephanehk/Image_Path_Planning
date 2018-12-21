@@ -129,7 +129,7 @@ k = 0
 p = 0
 possible_next_steps = []
 closed_list = []
-def hill_climb (node, gvalue, possible_next_steps, prev_node):
+def a_star (node, gvalue, possible_next_steps, prev_node):
     global k
     k = k+1
     #check to see if program has reached the end point
@@ -214,9 +214,9 @@ def hill_climb (node, gvalue, possible_next_steps, prev_node):
     gvalue = gvalue + next_step.g
     #repeat for next node, but check if program is going backwards cus it reached a dead end
     if k < 100:
-        hill_climb(next_step, gvalue, possible_next_steps, node)
+        a_star(next_step, gvalue, possible_next_steps, node)
 
-hill_climb(starting_node, 0, possible_next_steps, None)
+a_star(starting_node, 0, possible_next_steps, None)
 #---------------------------------------------------------STUFF FOR A STAR ALGORITHM----------------------------------------------------------------------------
 
 def print_matrix():
