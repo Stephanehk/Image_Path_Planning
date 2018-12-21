@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Mar 15 21:23:40 2018
+Created on Sat Oct 20 13:23:40 2018
 
-@author: 2020shatgiskesselldd
+@author: 2020shatgiskessell
 """
 import cv2
 import numpy as np
@@ -62,7 +62,7 @@ closed_list = []
 starting_node = Node(xcoordinate = 0, ycoordinate = 15, h = 0, g = 0 )
 closed_list.append(starting_node)
 
-ending_node = Node(xcoordinate = 17, ycoordinate = 18, h = 0, g = 0 )
+ending_node = Node(xcoordinate = 19, ycoordinate = 0, h = 0, g = 0 )
 #Test endpoints include:
 #(17, 18)
 #(17, 25)
@@ -127,12 +127,11 @@ def draw_line(x1,y1, x2,y2):
 #---------------------------------------------------------STUFF FOR A STAR ALGORITHM----------------------------------------------------------------------------
 k = 0
 p = 0
-
-def hill_climb (node, gvalue):
+possible_next_steps = []
+closed_list = []
+def hill_climb (node, gvalue, possible_next_steps, prev_node):
     global k
     k = k+1
-
-    global next_step
     #check to see if program has reached the end point
     if node.xcoordinate == ending_node.xcoordinate and node.ycoordinate == ending_node.ycoordinate:
         print ("Reached end node")
@@ -140,12 +139,7 @@ def hill_climb (node, gvalue):
 
     x = int(node.xcoordinate)
     y = int(node.ycoordinate)
-
-    print ("(x,y) = (", x ,",", y,")")
-
-
-    possible_next_steps = []
-
+    
     #get all the possible next steps from given node
     north = Matrix[y-1][x]
     east = Matrix[y][x+1]
@@ -157,77 +151,72 @@ def hill_climb (node, gvalue):
     south_west = Matrix[y+1][x-1]
 
     #calculate g value of each node (BE CAREFUL WITH THE MATH HERE) and add to array
-    if north != "o" and x >= 0 and (y-1) >=0:
+    if north != "o" and x >= 0 and (y-1) >=0 and north not in closed_list:
         north.g = 10
         possible_next_steps.append(north)
         #print ("north x is ", north.xcoordinate, "north y is ", north.ycoordinate)
 
-    if east != "o" and (x+1) >= 0 and y >=0:
+    if east != "o" and (x+1) >= 0 and y >=0 and east not in closed_list:
         east.g = 10
         possible_next_steps.append(east)
         #print ("east x is ", east.xcoordinate, "east y is ", east.ycoordinate)
 
-    if south != "o" and x >= 0 and (y+1) >=0:
+    if south != "o" and x >= 0 and (y+1) >=0 and south not in closed_list:
         south.g = 10
         possible_next_steps.append(south)
         #print ("south x is ", south.xcoordinate, "south y is ", south.ycoordinate)
 
-    if west != "o" and (x-1) >= 0 and (y) >=0:
+    if west != "o" and (x-1) >= 0 and (y) >=0 and west not in closed_list:
         west.g = 10
         possible_next_steps.append(west)
         #print ("west x is ", west.xcoordinate, "west y is ", west.ycoordinate)
 
-    if north_east != "o" and (x+1) >= 0 and (y-1) >=0:
+    if north_east != "o" and (x+1) >= 0 and (y-1) >=0 and north_east not in closed_list:
         north_east.g = 15
         possible_next_steps.append(north_east)
         #print ("north east x is ", north_east.xcoordinate, "north east y is ", north_east.ycoordinate)
 
-    if north_west != "o" and (x-1) >= 0 and (y-1) >=0:
+    if north_west != "o" and (x-1) >= 0 and (y-1) >=0 and north_west not in closed_list:
         north_west.g = 15
         possible_next_steps.append(north_west)
         #print ("north west x is ", north_west.xcoordinate, "north west y is ", north_west.ycoordinate)
 
-    if south_east != "o" and (x+1) >= 0 and (y+1) >=0:
+    if south_east != "o" and (x+1) >= 0 and (y+1) >=0 and south_east not in closed_list:
         south_east.g = 15
         possible_next_steps.append(south_east)
         #print ("south east x is ", south_east.xcoordinate, "south east y is ", south_east.ycoordinate)
 
-    if south_west != "o" and (x-1) >= 0 and (y+1) >=0:
+    if south_west != "o" and (x-1) >= 0 and (y+1) >=0 and south_west not in closed_list:
         south_west.g = 15
         possible_next_steps.append(south_west)
         #print ("south west x is ", south_west.xcoordinate, "south west y is ", south_west.ycoordinate)
 
-#check if there are any possible next steps
+    #check if there are any possible next steps
     if not possible_next_steps:
         print ("There are no possible next steps")
         return
 
-#Find lowerst cost node and add that to closed_list
+    #Sort possible next steps by cost
     possible_next_steps = sorted(possible_next_steps, key=lambda x: x.cost)
-#---------------------------------------------------------------------------------------------------------------------------------------
-
-    #Make sure u are not going back to a node u just visited
-    if len(possible_next_steps)>0 and possible_next_steps[0]not in closed_list:
-        next_step = possible_next_steps[0]
-        closed_list.append(next_step)
-
-    elif len(possible_next_steps) > 1 and possible_next_steps[0] in closed_list:
-        #go to all the next steps that have not already been visited
-        for i in range (0, len(possible_next_steps)-1):
-            if possible_next_steps[i] not in closed_list:
-                next_step = possible_next_steps[i]
-                closed_list.append(next_step)
+    #Find lowest cost node and make that next step
+    next_step = possible_next_steps[0]
+    #Add lowest cost node to closed list
+    closed_list.append(next_step)
+    #Remove this node from possible next steps
+    possible_next_steps.remove(next_step)
 
 
-#Draw line between current node and the next step node
+    print ("(x,y) = (", next_step.xcoordinate ,",", next_step.ycoordinate,")")
+
+    #Draw line between current node and the next step node
     draw_line(x, y, next_step.xcoordinate, next_step.ycoordinate)
-#update gvalue
+    #update gvalue
     gvalue = gvalue + next_step.g
-#repeat for next node, but check if program is going backwards cus it reached a dead end
-    if k < 30:
-        hill_climb(next_step, gvalue)
+    #repeat for next node, but check if program is going backwards cus it reached a dead end
+    if k < 100:
+        hill_climb(next_step, gvalue, possible_next_steps, node)
 
-hill_climb(starting_node, 0)
+hill_climb(starting_node, 0, possible_next_steps, None)
 #---------------------------------------------------------STUFF FOR A STAR ALGORITHM----------------------------------------------------------------------------
 
 def print_matrix():
